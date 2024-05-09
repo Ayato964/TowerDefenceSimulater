@@ -1,27 +1,32 @@
 package org.game.objects;
 
 import org.ayato.util.Display;
+import org.ayato.util.Position;
+import org.game.main.Main;
+import org.game.system.HPHotBer;
+import org.game.system.ModelDisplay;
 import org.game.util.Attribute;
 import org.game.util.StageNode;
 
 import java.awt.*;
 
 public abstract class TowerObject implements Display {
-    int x, y, w, h;
+    int x, y;
+    protected Position position;
+    private int HP, MHP;
     int speed;
     int point;
     protected Attribute attribute;
     private StageNode stageNode;
-    public TowerObject(){
-
-        point = 0;
-    }
-    public TowerObject(int w, int h, int speed, Attribute a){
-        this.w = w;
-        this.h = h;
+    protected final ModelDisplay model;
+    public TowerObject(int hp, int w, int h, int speed, Attribute a, ModelDisplay m){
         this.speed = speed;
+        HP = hp;
+        MHP = HP;
         attribute = a;
         point = 0;
+        model = m;
+        position = new Position(()->x, ()->y, w, h);
     }
     public void setPosition(int x, int y){
         this.x = x;
@@ -31,13 +36,13 @@ public abstract class TowerObject implements Display {
         stageNode = node;
     }
 
-
-
     @Override
     public void display(Graphics graphics) {
         move();
         pointCollision();
-        display(graphics, x, y);
+        model.display(graphics, position.getX(), position.getY(), position.w, position.h, attribute);
+        if(HP != MHP)
+            HPHotBer.displayHotBerAndViewParameter(Color.WHITE, Color.RED, graphics, HP, MHP, position.getX(), position.getY(), position.w / 2, 5);
     }
 
     private void pointCollision() {
@@ -65,7 +70,6 @@ public abstract class TowerObject implements Display {
             }
         }
     }
-    abstract boolean isIn(int x, int y);
-    abstract void display(Graphics g, int x, int y);
+    public abstract boolean isIn(int x, int y);
 
 }
